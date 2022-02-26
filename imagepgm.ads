@@ -2,3 +2,8 @@
 
 -- should deal with the I/O of images stored using the PGM “P2” file format
 -- subprograms this package needs to contain: readPGM() and writePGM()
+
+package imagepgm is
+    procedure readPGM;
+    procedure writePGM;
+end imagepgm;
