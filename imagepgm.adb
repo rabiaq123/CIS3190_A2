@@ -12,15 +12,15 @@ with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
     -- write the image to file as a P2 PGM format
 
 package body imagepgm is
-    procedure readPGM(inputFile: in unbounded_string) is 
+    procedure readPGM(input_fname: in unbounded_string) is 
     begin
         put_line("in readPGM");
-        put_line("The input file is: " & inputFile);
+        put_line("The input file is: " & input_fname);
     end readPGM;
 
-    procedure writePGM(outputFile: in unbounded_string ) is
+    procedure writePGM(output_fname: in unbounded_string ) is
     begin
         put_line("in writePGM");
-        put_line("The output file is: " & outputFile);
+        put_line("The output file is: " & output_fname);
     end writePGM;
 end imagepgm;

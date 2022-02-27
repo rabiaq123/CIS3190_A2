@@ -7,6 +7,6 @@ with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 -- subprograms this package needs to contain: readPGM() and writePGM()
 
 package imagepgm is
-    procedure readPGM(inputFile: in unbounded_string);
-    procedure writePGM(outputFile: in unbounded_string);
+    procedure readPGM(input_fname: in unbounded_string);
+    procedure writePGM(output_fname: in unbounded_string);
 end imagepgm;
