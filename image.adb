@@ -60,8 +60,8 @@ begin
     outputFile := getFilename(output);
     put_line("The output filename is: " & outputFile);
     -- test
-    readPGM;
-    writePGM;
+    readPGM(inputFile);
+    writePGM(outputFile);
     imageINV;
     imageLOG;
     imageSTRETCH;

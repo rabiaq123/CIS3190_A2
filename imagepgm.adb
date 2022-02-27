@@ -1,6 +1,8 @@
 -- package body
 
 with Ada.Text_IO; use Ada.Text_IO;
+with ada.strings.unbounded; use ada.strings.unbounded;
+with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 
 -- provide relevant error checking
 -- readPGM() should take as input a filename and return a record representing the image
@@ -10,13 +12,15 @@ with Ada.Text_IO; use Ada.Text_IO;
     -- write the image to file as a P2 PGM format
 
 package body imagepgm is
-    procedure readPGM is 
+    procedure readPGM(inputFile: in unbounded_string) is 
     begin
         put_line("in readPGM");
+        put_line("The input file is: " & inputFile);
     end readPGM;
 
-    procedure writePGM is
+    procedure writePGM(outputFile: in unbounded_string ) is
     begin
         put_line("in writePGM");
+        put_line("The output file is: " & outputFile);
     end writePGM;
 end imagepgm;
