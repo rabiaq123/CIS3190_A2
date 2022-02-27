@@ -6,11 +6,13 @@
 -- stored in an ASCII P2 PGM format
 
 with ada.Text_IO; use Ada.Text_IO;
-with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+--with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
-with Ada.Exceptions;  use Ada.Exceptions;
+--with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Strings.Maps; use Ada.Strings.Maps;
+with Ada.Strings; use Ada.Strings;
 
 with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
@@ -27,7 +29,7 @@ with imageprocess; use imageprocess;
 procedure image is
     type ftype is (input, output);
     type img_array is array (integer range <>, integer range <>) of integer; 
-    input_fname, output_fname, thing: unbounded_string;
+    input_fname, output_fname: unbounded_string;
     num_rows, num_cols: integer;
 
     -- print main program info to user
@@ -40,12 +42,11 @@ procedure image is
                 "https://ij.imjoy.io/"); new_line;
     end welcomeUser;
 
-    -- get name of input file to process or output file to write to and handle exceptions
+    -- ask user for the name of the file to be read or written, and handle exceptions
     function getFilename(fileType: ftype) return unbounded_string is 
         filename: unbounded_string;
         is_valid_file: boolean := false;
         response: character;
-
     begin 
         while is_valid_file = false loop
             -- prompt changes depending on whether input or output filename is needed
@@ -83,11 +84,11 @@ procedure image is
                 put("> ");
                 loop
                     get(response);
+                    skip_line; -- skip newline that will come from the previous input 
                     if response = 'Y' then
                         is_valid_file := true;
                     elsif response = 'N' then
                         is_valid_file := false;
-                        skip_line; -- skip newline that will coem from the previous input 
                     else 
                         put_line("Invalid response. Enter 'Y' or 'N'."); 
                         put("> ");
@@ -100,20 +101,57 @@ procedure image is
     end getFilename; 
 
     -- get input image dimensions to be able to store modified image in an array of that size
-    -- procedure getDimensions(input_fname: in unbounded_string; num_rows: out integer; num_cols: out integer)
-    -- begin 
-    -- end getDimensions;
+    procedure getDimensions(filename: in unbounded_string; n_rows: out integer; n_cols: out integer) is
+        fp: file_type; -- input file pointer
+        line_read: unbounded_string; -- line in file
+        first: positive;
+        last: natural;
+        idx: natural := 1;
+        whitespace : constant Character_Set := To_Set (' ');
+    begin 
+        put_line("in getDimensions");
+
+        -- read second line of input file
+        open(fp, in_file, to_string(filename));
+            get_line(fp, line_read); -- first line (image format, will always be P2)
+            get_line(fp, line_read); -- second line (image dimensions)
+        close(fp);
+        put_line("line read is " & line_read);
+
+        -- break string into substrings using whitespace delimiter
+        while idx in to_string(line_read)'Range loop
+            Find_Token
+                (Source => line_read,
+                Set     => whitespace,
+                From    => idx,
+                Test    => Outside,
+                First   => first,
+                Last    => last);
+            exit when last = 0;
+
+            -- store values in integer variables
+            if idx = 1 then
+                n_cols := integer'value(to_string(line_read)(first..last));
+            else 
+                n_rows := integer'value(to_string(line_read)(first..last));
+            end if;
+            idx := last + 1;
+        end loop;
+
+        put_line("num cols is:" & integer'image(n_cols) & " and num rows is:" & integer'image(n_rows) );
+    end getDimensions;
 
 begin
     -- print instructions and main information
     welcomeUser;
+
     -- get name of input and output files from user
     input_fname := getFilename(input);
-    put_line("The input filename is: " & input_fname);
     output_fname := getFilename(output);
-    put_line("The output filename is: " & output_fname);
+    
     -- get dimensions of PGM to declare object for modified image
-    -- getDimensions(input_fname, num_rows, num_cols);
+    getDimensions(input_fname, num_rows, num_cols);
+    
     -- test
     readPGM(input_fname);
     imageINV;
