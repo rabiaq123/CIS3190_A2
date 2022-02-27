@@ -25,8 +25,8 @@ with imageprocess; use imageprocess;
 
 
 procedure image is
-    fname : unbounded_string;
     type ftype is (input, output);
+    inputFile, outputFile : unbounded_string;
 
     -- print main program info to user
     procedure welcomeUser is 
@@ -38,23 +38,27 @@ procedure image is
                 "https://ij.imjoy.io/"); new_line;
     end welcomeUser;
 
-    -- get name of input file to process or output file to write to
-    procedure getFilename(filename : out unbounded_string; fileType : in ftype) is 
+    -- get name of input file to process or output file to write to and handle exceptions
+    function getFilename(fileType: ftype) return unbounded_string is 
+        filename: unbounded_string;
     begin 
         if fileType = input then
             put("Enter the name of the file to be read: ");
         else 
-            put("Enter the name of the file to be written: ");
+            put("Enter the name of the file to be written to: ");
         end if;
-        -- get(filename);
+        get_line(filename);
+        return filename;
     end getFilename; 
 
 begin
     -- print instructions and main information
     welcomeUser;
-    -- get name of input file from user
-    getFilename(fname, input);
-    put_line("The filename is: " & fname);
+    -- get name of input and output files from user
+    inputFile := getFilename(input);
+    put_line("The input filename is: " & inputFile);
+    outputFile := getFilename(output);
+    put_line("The output filename is: " & outputFile);
     -- test
     readPGM;
     writePGM;
