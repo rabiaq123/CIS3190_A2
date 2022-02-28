@@ -29,6 +29,7 @@ procedure image is
     type ftype is (input, output);
     type img_array is array (integer range <>, integer range <>) of integer; 
     input_fname, output_fname: unbounded_string;
+    is_valid_input_file : boolean := true;
 
     -- print main program info to user
     procedure welcomeUser is 
@@ -107,7 +108,10 @@ begin
     output_fname := getFilename(output);
     
     -- test
-    readPGM(input_fname);
+    readPGM(input_fname, is_valid_input_file);
+    if is_valid_input_file = false then
+        return;
+    end if;
     imageINV;
     imageLOG;
     imageSTRETCH;

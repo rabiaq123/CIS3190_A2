@@ -13,13 +13,13 @@ with Ada.Strings; use Ada.Strings;
     -- write the image to file as a P2 PGM format
  
 package body imagepgm is
-    procedure readPGM(input_fname: in unbounded_string) is 
+    procedure readPGM(input_fname: in unbounded_string; is_valid_file: in out boolean) is 
         num_rows, num_cols: integer;
+        fp: file_type; -- input file pointer
 
         -- get input image dimensions to be able to store modified image in an array of that size
-        procedure getHeaderInfo(filename: in unbounded_string; n_rows: out integer; n_cols: out integer) is
-            fp: file_type; -- input file pointer
-            line_read: unbounded_string; -- line in file
+        procedure getHeaderInfo(fp: in out file_type; is_valid_file: in out boolean; n_rows: out integer; n_cols: out integer) is
+            magic_id, dimensions: unbounded_string;
             first: positive;
             last: natural;
             idx: natural := 1;
@@ -28,38 +28,47 @@ package body imagepgm is
             put_line("in getHeaderInfo");
 
             -- read second line of input file
-            open(fp, in_file, to_string(filename));
-            get_line(fp, line_read); -- first line (image format, will always be P2)
-            get_line(fp, line_read); -- second line (image dimensions)
-            close(fp);
+            get_line(fp, magic_id); -- image format, should always be P2
+            get_line(fp, dimensions); -- image dimensions
 
-            -- break string into substrings using whitespace delimiter
-            while idx in to_string(line_read)'Range loop
-                Find_Token
-                    (Source => line_read,
-                    Set     => whitespace,
-                    From    => idx,
-                    Test    => Outside,
-                    First   => first,
-                    Last    => last);
-                exit when last = 0;
+            -- error handling for magic identifier
+            if magic_id /= "P2" then
+                put_line("Incorrect file format. The file must be in ASCII format (P2).");
+                put_line("Exiting program...");
+                is_valid_file := false;
+            end if;
 
-                -- store values in integer variables
-                if idx = 1 then
-                    n_cols := integer'value(to_string(line_read)(first..last));
-                else 
-                    n_rows := integer'value(to_string(line_read)(first..last));
-                end if;
-                idx := last + 1;
-            end loop;
-            put_line("num cols is:" & integer'image(n_cols) & " and num rows is:" & integer'image(n_rows) );
+            if is_valid_file then
+                -- break string containing dimensions into substrings using whitespace delimiter
+                while idx in to_string(dimensions)'Range loop
+                    Find_Token
+                        (Source => dimensions,
+                        Set     => whitespace,
+                        From    => idx,
+                        Test    => Outside,
+                        First   => first,
+                        Last    => last);
+                    exit when last = 0;
+
+                    -- store values in integer variables
+                    if idx = 1 then
+                        n_cols := integer'value(to_string(dimensions)(first..last));
+                    else 
+                        n_rows := integer'value(to_string(dimensions)(first..last));
+                    end if;
+                    idx := last + 1;
+                end loop;
+                put_line("num cols is:" & integer'image(n_cols) & " and num rows is:" & integer'image(n_rows) );
+            end if;
         end getHeaderInfo;
 
     begin
         put_line("in readPGM");
         put_line("The input file is: " & input_fname);
         -- get header info and perform error checking
-        getHeaderInfo(input_fname, num_rows, num_cols);
+        open(fp, in_file, to_string(input_fname));
+        getHeaderInfo(fp, is_valid_file, num_rows, num_cols);
+        close(fp);
     end readPGM;
 
     procedure writePGM(output_fname: in unbounded_string ) is
