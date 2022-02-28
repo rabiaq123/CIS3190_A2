@@ -7,6 +7,7 @@ with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
 with Ada.Strings; use Ada.Strings; 
+with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
 with imagedata; use imagedata;
@@ -20,15 +21,15 @@ procedure image is
     type ftype is (input, output);
     input_fname, output_fname: unbounded_string;
     is_valid_input_file : boolean := true;
+    choice: integer;
 
-    -- print main program info to user
+    -- print program info to user
     procedure welcomeUser is 
     begin
         put_line("IMAGE PROCESSING PROGRAM"); new_line;
         put_line("Welcome! This ADA program can perform image processing operations on " &
                 "any grayscale image stored in an ASCII P2 PGM format.");
-        put_line("You can view your input images and the output created through " &
-                "https://ij.imjoy.io/"); new_line;
+        put_line("Once you enter a valid input PGM image file, you'll have a list of options to choose from."); new_line;
     end welcomeUser;
 
     -- ask user for the name of the file to be read or written, and handle exceptions
@@ -89,21 +90,66 @@ procedure image is
         return filename;
     end getFilename; 
 
+    -- print menu user and get their response
+    procedure showMenu(choice: out integer) is 
+    begin
+        new_line;
+        put_line("Please choose from one of the following options:");
+        put_line("1. Apply image inversion");
+        put_line("2. Apply LOG function");
+        put_line("3. Apply contrast stretching");
+        put_line("4. Apply histogram equalization");
+        put_line("5. Write PGM image to file");
+        put_line("6. Quit");
+        put("> ");
+        get(choice);
+        skip_line;
+    end showMenu;
+
+    -- call subprogram in accordance with user input
+    procedure performAction(choice: out integer) is 
+    begin
+        loop
+        showMenu(choice);
+        case choice is
+            when 1 =>
+                imageINV;
+            when 2 =>
+                imageLOG;
+            when 3 =>
+                imageSTRETCH;
+            --when 4 =>
+            --    makeHIST(img_modified);
+            when 5 =>
+                output_fname := getFilename(output);
+                writePGM(output_fname);
+            when 6 =>
+                put_line("Exiting program...");
+                return;
+            when others =>
+                put_line("Invalid input.");
+        end case;
+    end loop;
+    end performAction;
+
 begin
-    -- print instructions and main information
     welcomeUser;
 
-    -- get name of input and output files from user
-    input_fname := getFilename(input);
-    output_fname := getFilename(output);
     -- read input file and store contents in record
-    readPGM(rec, input_fname, is_valid_input_file);
+    input_fname := getFilename(input);
+    readPGM(img_read, input_fname, is_valid_input_file);
     if is_valid_input_file = false then
         return;
     end if;
-    -- test
-    imageINV;
-    imageLOG;
-    imageSTRETCH;
-    writePGM(output_fname);
+    img_modified := img_read;
+    for i in 1..img_read.rows loop
+        put("row" & integer'image(i) & ":");
+        for j in 1..img_read.cols loop
+            put(integer'image(img_read.pixel(i,j)) & " ");
+        end loop;
+        new_line;
+    end loop;
+
+    -- give user options for what to do with input data read
+    performAction(choice);
 end image;

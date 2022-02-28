@@ -23,4 +23,10 @@ package body imageprocess is
     begin
         put_line("in imageSTRETCH");
     end imageSTRETCH;
+
+    function makeHIST(img_modified: img_record) return integer is 
+    begin
+        put_line("in makeHIST()");
+        return 1;
+    end makeHIST;
 end imageprocess;

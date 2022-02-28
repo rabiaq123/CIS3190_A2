@@ -6,5 +6,5 @@ package imagedata is
             rows: integer;
             cols: integer;
         end record;
-    rec: img_record;
+    img_read, img_modified: img_record;
 end imagedata;

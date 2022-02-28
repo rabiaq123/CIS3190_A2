@@ -10,7 +10,7 @@ package body imagepgm is
 
     -- take filename as input and return a record representing the image
     -- include error checking for magic identifier and other inconsistencies with the input file
-    procedure readPGM(rec: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean) is 
+    procedure readPGM(img_read: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean) is 
         fp: file_type;
         num_rows, num_cols, max_gs: integer;
         og_img: img_array;
@@ -100,14 +100,14 @@ package body imagepgm is
         end getImagePixels;
 
         -- store image file data in record
-        procedure storeInRecord(rec: in out img_record; num_cols: in integer; num_rows: in integer; og_img: in img_array) is 
+        procedure storeInRecord(img_read: in out img_record; num_cols: in integer; num_rows: in integer; og_img: in img_array) is 
         begin
             put_line("in storeInRecord");
-            rec.cols := num_cols;
-            rec.rows := num_rows;
+            img_read.cols := num_cols;
+            img_read.rows := num_rows;
             for i in 1..num_rows loop
                 for j in 1..num_cols loop
-                    rec.pixel(i,j) := og_img(i,j);
+                    img_read.pixel(i,j) := og_img(i,j);
                 end loop;
             end loop;
         end storeInRecord;
@@ -120,12 +120,13 @@ package body imagepgm is
         getImagePixels(fp, og_img);
         close(fp);
         -- store values in record
-        storeInRecord(rec, num_cols, num_rows, og_img);
+        storeInRecord(img_read, num_cols, num_rows, og_img);
     end readPGM;
 
     -- take image record as input, and write the image to file as a P2 PGM format
     procedure writePGM(output_fname: in unbounded_string) is
     begin
         put_line("in writePGM");
+        put_line("You can view your input images and the output created through https://ij.imjoy.io/");
     end writePGM;
 end imagepgm;
