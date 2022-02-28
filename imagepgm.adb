@@ -6,18 +6,26 @@ with Ada.Strings.Maps; use Ada.Strings.Maps;
 with Ada.Strings; use Ada.Strings;
 
 -- provide relevant error checking
--- readPGM() should take as input a filename and return a record representing the image
-    -- generate an error if the wrong magic identifier is present,
-    -- or if there are any other inconsistencies with the input file
--- writePGM() should take as input a record representing an image, and 
-    -- write the image to file as a P2 PGM format
  
 package body imagepgm is
+
+    -- Take filename as input and return a record representing the image.
+    -- Generate an error if the wrong magic identifier is present,
+    -- or if there are any other inconsistencies with the input file.
     procedure readPGM(input_fname: in unbounded_string; is_valid_file: in out boolean) is 
-        num_rows, num_cols, max_gs: integer;
         fp: file_type; -- input file pointer
-        type img_array is array (1..500, 1..500) of integer; 
-        og_img: img_array;
+        -- data to store in record
+        num_rows, num_cols, max_gs: integer; -- dimensions and max grayscale
+        type img_array is array (1..500, 1..500) of integer; -- custom data type for image array
+        og_img: img_array; -- unmodified image array
+        -- record
+        type img_record is
+            record
+                pixel: img_array; 
+                rows: integer;
+                cols: integer;
+            end record;
+        rec: img_record;
 
         -- get input image dimensions to be able to store modified image in an array of that size
         procedure getHeaderInfo(fp: in out file_type; is_valid_file: in out boolean; n_rows: out integer; n_cols: out integer; max_gs: out integer) is
@@ -82,8 +90,9 @@ package body imagepgm is
                 get_line(fp, line_of_data);
 
                 row_idx := row_idx + 1; -- every loop iteration represents a row of image data
-                col_idx := 1; -- reset column index once all current line data is read
-                str_idx := 1; -- reset string index once all current line data is read
+                -- reset column and string indices once all current line data is read
+                col_idx := 1; 
+                str_idx := 1;
                 -- break line of image data into substrings using whitespace delimiter
                 while str_idx in to_string(line_of_data)'Range loop
                     Find_Token
@@ -102,31 +111,42 @@ package body imagepgm is
             end loop;
         end getImagePixels;
 
+        -- store image file data in record
+        procedure storeInRecord(rec: in out img_record; num_cols: in integer; num_rows: in integer; og_img: in img_array) is 
+        begin
+            put_line("in storeInRecord");
+            rec.cols := num_cols;
+            rec.rows := num_rows;
+            for i in 1..num_rows loop
+                for j in 1..num_cols loop
+                    rec.pixel(i,j) := og_img(i,j);
+                end loop;
+            end loop;
+
+            --for i in 1..num_rows loop
+            --    put("row" & integer'image(i) & ":");
+            --    for j in 1..num_cols loop
+            --        put(integer'image(rec.pixel(i,j)) & " ");
+            --    end loop;
+            --    new_line;
+            --end loop;
+        end storeInRecord;
+
     begin
         put_line("in readPGM");
-        put_line("The input file is: " & input_fname);
+        -- store PGM file contents
         open(fp, in_file, to_string(input_fname));
-        
-        -- get header info and perform error checking
-        getHeaderInfo(fp, is_valid_file, num_rows, num_cols, max_gs);
-
-        -- store image in integer array
-        getImagePixels(fp, og_img);
-        --put_line("The image is:");
-        --for i in 1..num_rows loop
-        --    put("line" & integer'image(i) & ":");
-        --    for j in 1..num_cols loop
-        --        put(integer'image(og_img(i,j)) & " ");
-        --    end loop;
-        --    new_line;
-        --end loop;
-        
+        getHeaderInfo(fp, is_valid_file, num_rows, num_cols, max_gs); -- get header info and perform error checking
+        getImagePixels(fp, og_img); -- store image in integer array 
         close(fp);
+        -- store values in record
+        storeInRecord(rec, num_cols, num_rows, og_img);
+
     end readPGM;
 
+    -- take image recordas input, and write the image to file as a P2 PGM format
     procedure writePGM(output_fname: in unbounded_string) is
     begin
         put_line("in writePGM");
-        put_line("The output file is: " & output_fname);
     end writePGM;
 end imagepgm;
