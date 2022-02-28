@@ -3,6 +3,7 @@
 with ada.strings.unbounded; use ada.strings.unbounded;
 with imagedata; use imagedata;
 
+
 -- should deal with the I/O of images stored using the PGM “P2” file format
 -- subprograms this package needs to contain: readPGM() and writePGM()
 

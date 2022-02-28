@@ -2,9 +2,6 @@
 -- 1046427
 -- March 4, 2022
 
--- Ada program to perform image processing operations on a grayscale image
--- stored in an ASCII P2 PGM format
-
 with ada.Text_IO; use Ada.Text_IO;
 with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
@@ -14,13 +11,10 @@ with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
 with imagedata; use imagedata;
 
+
 -- main wrapper program
-
--- allows user to interact with the imagePROCESS and imagePGM packages; reading in images,
+-- allow user to interact with the imagePROCESS and imagePGM packages; reading in images,
 -- manipulating them, and writing them to file
-
--- include subprogram getFilename() to ask user for the name of the file to be read or written. 
--- An example call might be: fn = getFilename(“r”) to obtain the filename of an image to read.
 
 procedure image is
     type ftype is (input, output);

@@ -5,7 +5,6 @@ with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with Ada.Strings.Maps; use Ada.Strings.Maps;
 with Ada.Strings; use Ada.Strings;
 
--- provide relevant error checking
  
 package body imagepgm is
 

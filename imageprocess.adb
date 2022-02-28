@@ -2,6 +2,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+
 -- image processing algorithms
 -- subprogram imageINV(I) to perform image inversion
 -- subprogram imageLOG(I) to perform logarithmic transformation
