@@ -144,7 +144,7 @@ package body imagepgm is
 
     end readPGM;
 
-    -- take image recordas input, and write the image to file as a P2 PGM format
+    -- take image record as input, and write the image to file as a P2 PGM format
     procedure writePGM(output_fname: in unbounded_string) is
     begin
         put_line("in writePGM");
