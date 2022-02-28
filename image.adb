@@ -6,13 +6,12 @@
 -- stored in an ASCII P2 PGM format
 
 with ada.Text_IO; use Ada.Text_IO;
---with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
+with Ada.Strings; use Ada.Strings; 
+--with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 --with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Strings.Maps; use Ada.Strings.Maps;
-with Ada.Strings; use Ada.Strings;
 
 with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
@@ -30,7 +29,6 @@ procedure image is
     type ftype is (input, output);
     type img_array is array (integer range <>, integer range <>) of integer; 
     input_fname, output_fname: unbounded_string;
-    num_rows, num_cols: integer;
 
     -- print main program info to user
     procedure welcomeUser is 
@@ -100,47 +98,6 @@ procedure image is
         return filename;
     end getFilename; 
 
-    -- get input image dimensions to be able to store modified image in an array of that size
-    procedure getDimensions(filename: in unbounded_string; n_rows: out integer; n_cols: out integer) is
-        fp: file_type; -- input file pointer
-        line_read: unbounded_string; -- line in file
-        first: positive;
-        last: natural;
-        idx: natural := 1;
-        whitespace : constant Character_Set := To_Set (' ');
-    begin 
-        put_line("in getDimensions");
-
-        -- read second line of input file
-        open(fp, in_file, to_string(filename));
-            get_line(fp, line_read); -- first line (image format, will always be P2)
-            get_line(fp, line_read); -- second line (image dimensions)
-        close(fp);
-        put_line("line read is " & line_read);
-
-        -- break string into substrings using whitespace delimiter
-        while idx in to_string(line_read)'Range loop
-            Find_Token
-                (Source => line_read,
-                Set     => whitespace,
-                From    => idx,
-                Test    => Outside,
-                First   => first,
-                Last    => last);
-            exit when last = 0;
-
-            -- store values in integer variables
-            if idx = 1 then
-                n_cols := integer'value(to_string(line_read)(first..last));
-            else 
-                n_rows := integer'value(to_string(line_read)(first..last));
-            end if;
-            idx := last + 1;
-        end loop;
-
-        put_line("num cols is:" & integer'image(n_cols) & " and num rows is:" & integer'image(n_rows) );
-    end getDimensions;
-
 begin
     -- print instructions and main information
     welcomeUser;
@@ -148,9 +105,6 @@ begin
     -- get name of input and output files from user
     input_fname := getFilename(input);
     output_fname := getFilename(output);
-    
-    -- get dimensions of PGM to declare object for modified image
-    getDimensions(input_fname, num_rows, num_cols);
     
     -- test
     readPGM(input_fname);
