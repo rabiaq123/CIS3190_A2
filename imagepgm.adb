@@ -95,12 +95,10 @@ package body imagepgm is
                         Last    => last);
                     exit when last = 0;
                     -- store values in integer variables
-                    put_line("test " & to_string(line_of_data)(first..last));
                     img(row_idx, col_idx) := integer'value(to_string(line_of_data)(first..last));
                     col_idx := col_idx + 1;
                     str_idx := last + 1;
                 end loop;
-                put_line("The line read in was: " & line_of_data);
             end loop;
         end getImagePixels;
 
@@ -114,14 +112,14 @@ package body imagepgm is
 
         -- store image in integer array
         getImagePixels(fp, og_img);
-        put_line("The image is:");
-        for i in 1..num_rows loop
-            put_line("line" & integer'image(i) & ":");
-            for j in 1..num_cols loop
-                put(integer'image(og_img(i,j)) & " ");
-            end loop;
-            new_line;
-        end loop;
+        --put_line("The image is:");
+        --for i in 1..num_rows loop
+        --    put("line" & integer'image(i) & ":");
+        --    for j in 1..num_cols loop
+        --        put(integer'image(og_img(i,j)) & " ");
+        --    end loop;
+        --    new_line;
+        --end loop;
         
         close(fp);
     end readPGM;
