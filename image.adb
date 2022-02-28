@@ -10,11 +10,9 @@ with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
 with Ada.Strings; use Ada.Strings; 
---with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
---with Ada.Exceptions; use Ada.Exceptions;
-
 with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
+with imagedata; use imagedata;
 
 -- main wrapper program
 
@@ -23,7 +21,6 @@ with imageprocess; use imageprocess;
 
 -- include subprogram getFilename() to ask user for the name of the file to be read or written. 
 -- An example call might be: fn = getFilename(“r”) to obtain the filename of an image to read.
-
 
 procedure image is
     type ftype is (input, output);
@@ -105,12 +102,12 @@ begin
     -- get name of input and output files from user
     input_fname := getFilename(input);
     output_fname := getFilename(output);
-    
-    -- test
-    readPGM(input_fname, is_valid_input_file);
+    -- read input file and store contents in record
+    readPGM(rec, input_fname, is_valid_input_file);
     if is_valid_input_file = false then
         return;
     end if;
+    -- test
     imageINV;
     imageLOG;
     imageSTRETCH;
