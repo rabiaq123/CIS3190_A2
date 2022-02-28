@@ -27,7 +27,6 @@ with imageprocess; use imageprocess;
 
 procedure image is
     type ftype is (input, output);
-    type img_array is array (integer range <>, integer range <>) of integer; 
     input_fname, output_fname: unbounded_string;
     is_valid_input_file : boolean := true;
 
