@@ -5,6 +5,7 @@ package imagedata is
             pixel: img_array; 
             rows: integer;
             cols: integer;
+            max_gs: integer;
         end record;
     img_read, img_modified: img_record;
 end imagedata;

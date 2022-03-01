@@ -3,6 +3,7 @@
 -- March 4, 2022
 
 with ada.Text_IO; use Ada.Text_IO;
+with Ada.IO_Exceptions; use Ada.IO_Exceptions;
 with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
@@ -20,8 +21,7 @@ with imagedata; use imagedata;
 procedure image is
     type ftype is (input, output);
     input_fname, output_fname: unbounded_string;
-    is_valid_input_file : boolean := true;
-    choice: integer;
+    is_valid_input_file: boolean := true;
 
     -- print program info to user
     procedure welcomeUser is 
@@ -107,29 +107,33 @@ procedure image is
     end showMenu;
 
     -- call subprogram in accordance with user input
-    procedure performAction(choice: out integer) is 
+    procedure performAction(img_read: in img_record) is 
+        choice: integer; 
+        img_modified: img_record;
+        min, max: integer := 0;
     begin
+        img_modified := img_read;
         loop
-        showMenu(choice);
-        case choice is
-            when 1 =>
-                imageINV;
-            when 2 =>
-                imageLOG;
-            when 3 =>
-                imageSTRETCH;
-            --when 4 =>
-            --    makeHIST(img_modified);
-            when 5 =>
-                output_fname := getFilename(output);
-                writePGM(output_fname);
-            when 6 =>
-                put_line("Exiting program...");
-                return;
-            when others =>
-                put_line("Invalid input.");
-        end case;
-    end loop;
+            showMenu(choice);
+            case choice is
+                when 1 =>
+                    imageINV(img_modified, img_read);
+                when 2 =>
+                    imageLOG(img_modified, img_read);
+                when 3 =>
+                    imageSTRETCH(img_modified, img_read, min, max);
+                --when 4 =>
+                --    makeHIST(img_read);
+                when 5 =>
+                    output_fname := getFilename(output);
+                    writePGM(output_fname, img_modified);
+                when 6 =>
+                    put_line("Exiting program...");
+                    return;
+                when others =>
+                    put_line("Invalid input.");
+            end case;
+        end loop;
     end performAction;
 
 begin
@@ -141,15 +145,15 @@ begin
     if is_valid_input_file = false then
         return;
     end if;
-    img_modified := img_read;
-    for i in 1..img_read.rows loop
-        put("row" & integer'image(i) & ":");
-        for j in 1..img_read.cols loop
-            put(integer'image(img_read.pixel(i,j)) & " ");
-        end loop;
-        new_line;
-    end loop;
+    
+    --for i in 1..img_read.rows loop
+    --    put("row" & integer'image(i) & ":");
+    --    for j in 1..img_read.cols loop
+    --        put(integer'image(img_read.pixel(i,j)) & " ");
+    --    end loop;
+    --    new_line;
+    --end loop;
 
     -- give user options for what to do with input data read
-    performAction(choice);
+    performAction(img_read);
 end image;

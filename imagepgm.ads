@@ -9,5 +9,5 @@ with imagedata; use imagedata;
 
 package imagepgm is
     procedure readPGM(img_read: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean);
-    procedure writePGM(output_fname: in unbounded_string);
+    procedure writePGM(output_fname: in unbounded_string; img_modified: in img_record);
 end imagepgm;

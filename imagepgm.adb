@@ -100,11 +100,12 @@ package body imagepgm is
         end getImagePixels;
 
         -- store image file data in record
-        procedure storeInRecord(img_read: in out img_record; num_cols: in integer; num_rows: in integer; og_img: in img_array) is 
+        procedure storeInRecord(img_read: in out img_record; num_cols: in integer; num_rows: in integer; max_gs: in integer; og_img: in img_array) is 
         begin
             put_line("in storeInRecord");
             img_read.cols := num_cols;
             img_read.rows := num_rows;
+            img_read.max_gs := max_gs;
             for i in 1..num_rows loop
                 for j in 1..num_cols loop
                     img_read.pixel(i,j) := og_img(i,j);
@@ -120,13 +121,29 @@ package body imagepgm is
         getImagePixels(fp, og_img);
         close(fp);
         -- store values in record
-        storeInRecord(img_read, num_cols, num_rows, og_img);
+        storeInRecord(img_read, num_cols, num_rows, max_gs, og_img);
     end readPGM;
 
     -- take image record as input, and write the image to file as a P2 PGM format
-    procedure writePGM(output_fname: in unbounded_string) is
+    procedure writePGM(output_fname: in unbounded_string; img_modified: in img_record) is
+    fp: file_type;
+
     begin
         put_line("in writePGM");
         put_line("You can view your input images and the output created through https://ij.imjoy.io/");
+
+        create(fp, out_file, to_string(output_fname));
+        set_output(fp);
+        put_line("P2");
+        put_line(integer'image(img_modified.cols) & integer'image(img_modified.rows));
+        put_line(integer'image(img_modified.max_gs));
+        for i in 1..img_modified.rows loop
+            for j in 1..img_modified.cols loop
+                put(integer'image(img_modified.pixel(i,j)));
+            end loop;
+            new_line;
+        end loop;
+        set_output(standard_output);
+        close(fp);
     end writePGM;
 end imagepgm;
