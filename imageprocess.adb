@@ -6,7 +6,7 @@ with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 -- image processing algorithms
 -- subprogram imageINV(I) to perform image inversion
 -- subprogram imageLOG(I) to perform logarithmic transformation
--- subprogram imageSTRETCH(I, imin, imax) to pterform contrast-stretching
+-- subprogram imageSTRETCH(I, imin, imax) to perform contrast-stretching
 
 package body imageprocess is
 

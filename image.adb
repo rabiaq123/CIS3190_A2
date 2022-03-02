@@ -106,11 +106,24 @@ procedure image is
         skip_line;
     end showMenu;
 
+    -- get min and max intensity values if user chooses to perform image stretching function
+    procedure getIntensityValues(min: out integer; max: out integer) is 
+        min_str, max_str: unbounded_string;
+    begin
+        put("Minimum intensity value: ");
+        get_line(min_str);
+        put("Maximum intensity value: ");
+        get_line(max_str);
+        -- convert to integer
+        min := integer'value(to_string(min_str));
+        max := integer'value(to_string(max_str));
+    end getIntensityValues;
+
     -- call subprogram in accordance with user input
     procedure performAction(img_read: in img_record) is 
         choice: integer; 
         img_modified: img_record;
-        min, max: integer := 0;
+        min, max: integer;
     begin
         img_modified := img_read;
         loop
@@ -121,6 +134,7 @@ procedure image is
                 when 2 =>
                     imageLOG(img_modified, img_read);
                 when 3 =>
+                    getIntensityValues(min, max);
                     imageSTRETCH(img_modified, img_read, min, max);
                 --when 4 =>
                 --    makeHIST(img_read);
@@ -142,6 +156,7 @@ begin
     -- read input file and store contents in record
     input_fname := getFilename(input);
     readPGM(img_read, input_fname, is_valid_input_file);
+    
     if is_valid_input_file = false then
         return;
     end if;
