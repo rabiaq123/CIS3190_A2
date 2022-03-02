@@ -119,6 +119,19 @@ procedure image is
         max := integer'value(to_string(max_str));
     end getIntensityValues;
 
+    -- perform histogram equalization
+    procedure imageEqualization(img_read: in img_record) is 
+        hist: hist_arr (1..img_read.max_gs+1);
+    begin
+        hist := makeHIST(img_read);
+        put_line("the histogram array is: ");
+        -- max_gs+1 because array start index is 1 (not 0)
+        -- for i in 1..img_read.max_gs+1 loop
+        --     put_line(integer'image(i-1) & ":" & integer'image(hist(i)));
+        -- end loop;
+        -- TODO: perform histogram equalization
+    end imageEqualization;
+
     -- call subprogram in accordance with user input
     procedure performAction(img_read: in img_record; img_modified: in out img_record) is 
         choice: integer; 
@@ -138,8 +151,8 @@ procedure image is
                 when 3 =>
                     getIntensityValues(min, max);
                     imageSTRETCH(img_modified, min, max);
-                --when 4 =>
-                --    makeHIST(img_read);
+                when 4 =>
+                    imageEqualization(img_read);
                 when 5 =>
                     put_line("Exiting program...");
                     return;
@@ -160,7 +173,7 @@ begin
         return;
     end if;
     -- give user options for what to do with input data read
-    performAction (img_read, img_modified);
+    performAction(img_read, img_modified);
     -- write to output file
     output_fname := getFilename (output);
     writePGM (output_fname, img_modified);

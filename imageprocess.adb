@@ -21,7 +21,7 @@ package body imageprocess is
         end loop;
     end imageINV;
 
-    -- perfrom logarithmic transformation
+    -- perform logarithmic transformation
     procedure imageLOG(img_modified: in out img_record) is 
     begin
         put_line("in imageLOG");
@@ -45,9 +45,25 @@ package body imageprocess is
         end loop;        
     end imageSTRETCH;
 
-    function makeHIST(img_read: img_record) return integer is 
+    -- make histogram of image
+    function makeHIST(img_read: img_record) return hist_arr is 
+        hist: hist_arr(1..img_read.max_gs+1);
+        num_occurrences: integer;
     begin
         put_line("in makeHIST()");
-        return 1;
+        -- count number of times (index-1) occurs in image array, and store value in hist(index)
+        for hist_idx in 1..img_read.max_gs+1 loop
+            num_occurrences := 0;
+            -- loop through image array and increment num occurences when applicable
+            for i in 1..img_read.rows loop
+                for j in 1..img_read.cols loop
+                    if img_read.pixel(i,j) = (hist_idx - 1) then
+                        num_occurrences := num_occurrences + 1;
+                    end if;
+                end loop;
+            end loop;
+            hist(hist_idx) := num_occurrences;
+        end loop;
+        return hist;
     end makeHIST;
 end imageprocess;
