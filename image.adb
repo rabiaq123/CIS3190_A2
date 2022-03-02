@@ -120,9 +120,8 @@ procedure image is
     end getIntensityValues;
 
     -- call subprogram in accordance with user input
-    procedure performAction(img_read: in img_record) is 
+    procedure performAction(img_read: in img_record; img_modified: in out img_record) is 
         choice: integer; 
-        img_modified: img_record;
         min, max: integer;
         is_valid_input: boolean := false;
     begin
@@ -133,12 +132,12 @@ procedure image is
             showMenu(choice);
             case choice is
                 when 1 =>
-                    imageINV(img_modified, img_read);
+                    imageINV(img_modified);
                 when 2 =>
-                    imageLOG (img_modified, img_read);
+                    imageLOG (img_modified);
                 when 3 =>
                     getIntensityValues(min, max);
-                    imageSTRETCH(img_modified, img_read, min, max);
+                    imageSTRETCH(img_modified, min, max);
                 --when 4 =>
                 --    makeHIST(img_read);
                 when 5 =>
@@ -161,7 +160,7 @@ begin
         return;
     end if;
     -- give user options for what to do with input data read
-    performAction (img_read);
+    performAction (img_read, img_modified);
     -- write to output file
     output_fname := getFilename (output);
     writePGM (output_fname, img_modified);
