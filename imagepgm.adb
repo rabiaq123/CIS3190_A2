@@ -130,7 +130,7 @@ package body imagepgm is
 
     begin
         put_line("in writePGM");
-        put_line("You can view your input images and the output created through https://ij.imjoy.io/");
+        put_line("You can view your input images and the output created through https://ij.imjoy.io/.");
 
         create(fp, out_file, to_string(output_fname));
         set_output(fp);

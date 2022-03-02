@@ -29,7 +29,7 @@ procedure image is
         put_line("IMAGE PROCESSING PROGRAM"); new_line;
         put_line("Welcome! This ADA program can perform image processing operations on " &
                 "any grayscale image stored in an ASCII P2 PGM format.");
-        put_line("Once you enter a valid input PGM image file, you'll have a list of options to choose from."); new_line;
+        put_line("Once you enter a valid input PGM image file, you'll have a list of options to choose from.");
     end welcomeUser;
 
     -- ask user for the name of the file to be read or written, and handle exceptions
@@ -38,6 +38,7 @@ procedure image is
         is_valid_file: boolean := false;
         response: character;
     begin 
+        new_line;
         while is_valid_file = false loop
             -- prompt changes depending on whether input or output filename is needed
             if fileType = input then
@@ -99,8 +100,7 @@ procedure image is
         put_line("2. Apply LOG function");
         put_line("3. Apply contrast stretching");
         put_line("4. Apply histogram equalization");
-        put_line("5. Write PGM image to file");
-        put_line("6. Quit");
+        put_line("5. Quit");
         put("> ");
         get(choice);
         skip_line;
@@ -124,43 +124,48 @@ procedure image is
         choice: integer; 
         img_modified: img_record;
         min, max: integer;
+        is_valid_input: boolean := false;
     begin
         img_modified := img_read;
         loop
+            exit when is_valid_input;
+            is_valid_input := true; -- reset to true so flag is only set to false when latest user input is invalid
             showMenu(choice);
             case choice is
                 when 1 =>
                     imageINV(img_modified, img_read);
                 when 2 =>
-                    imageLOG(img_modified, img_read);
+                    imageLOG (img_modified, img_read);
                 when 3 =>
                     getIntensityValues(min, max);
                     imageSTRETCH(img_modified, img_read, min, max);
                 --when 4 =>
                 --    makeHIST(img_read);
                 when 5 =>
-                    output_fname := getFilename(output);
-                    writePGM(output_fname, img_modified);
-                when 6 =>
                     put_line("Exiting program...");
                     return;
                 when others =>
                     put_line("Invalid input.");
+                    is_valid_input := false;
             end case;
         end loop;
     end performAction;
 
 begin
     welcomeUser;
-
     -- read input file and store contents in record
     input_fname := getFilename(input);
     readPGM(img_read, input_fname, is_valid_input_file);
-    
+    -- return if input file is invalid
     if is_valid_input_file = false then
         return;
     end if;
-    
+    -- give user options for what to do with input data read
+    performAction (img_read);
+    -- write to output file
+    output_fname := getFilename (output);
+    writePGM (output_fname, img_modified);
+
     --for i in 1..img_read.rows loop
     --    put("row" & integer'image(i) & ":");
     --    for j in 1..img_read.cols loop
@@ -168,7 +173,4 @@ begin
     --    end loop;
     --    new_line;
     --end loop;
-
-    -- give user options for what to do with input data read
-    performAction(img_read);
 end image;
