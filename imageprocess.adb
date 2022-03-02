@@ -41,8 +41,14 @@ package body imageprocess is
         for i in 1..img_modified.rows loop
             for j in 1..img_modified.cols loop
                 img_modified.pixel(i,j) := 255 * (img_modified.pixel(i,j) - min) / (max - min);
+                -- keep pixel value within bounds
+                if (img_modified.pixel(i,j) > 255) then
+                    img_modified.pixel(i,j) := max;
+                elsif (img_modified.pixel(i,j) < 0) then
+                    img_modified.pixel(i,j) := 0;
+                end if;
             end loop;
-        end loop;        
+        end loop;
     end imageSTRETCH;
 
     -- make histogram of image
