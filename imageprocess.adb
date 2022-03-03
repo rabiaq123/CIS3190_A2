@@ -53,22 +53,22 @@ package body imageprocess is
 
     -- make histogram of image
     function makeHIST(img_read: img_record) return hist_arr is 
-        hist: hist_arr(1..img_read.max_gs+1);
+        hist: hist_arr(1..img_read.max_gs+2);
         num_occurrences: integer;
     begin
         put_line("in makeHIST()");
         -- count number of times (index-1) occurs in image array, and store value in hist(index)
-        for hist_idx in 1..img_read.max_gs+1 loop
+        for idx in 1..img_read.max_gs+2 loop
             num_occurrences := 0;
             -- loop through image array and increment num occurences when applicable
             for i in 1..img_read.rows loop
                 for j in 1..img_read.cols loop
-                    if img_read.pixel(i,j) = (hist_idx - 1) then
+                    if img_read.pixel(i,j) = (idx - 1) then
                         num_occurrences := num_occurrences + 1;
                     end if;
                 end loop;
             end loop;
-            hist(hist_idx) := num_occurrences;
+            hist(idx) := num_occurrences;
         end loop;
         return hist;
     end makeHIST;
@@ -78,27 +78,23 @@ package body imageprocess is
         img: img_record := img_read;
         num_pixels: constant integer := img_read.cols * img_read.rows;
         pdf: array(1..hist'length) of float; -- probability density function
-        cumulative_hist: array(1..256) of float; -- cumulative histogram; 256-element array
+        cumulative_hist: array(1..257) of float; -- cumulative histogram; 256-element array
     begin
         -- calculate PDF of histogram by dividing each bin in the histogram by the total number of pixels in the image
-        for i in 1..hist'length loop
-            pdf(i) :=  float(hist(i) / num_pixels);
-            --Put_Line (integer'image(i) & ":" & float'image(pdf(i)));
-            --Put_Line (integer'image(i) & ":" & integer'image(hist(i)));
+        for i in 1 .. hist'Length loop
+            pdf (i) := float(hist (i)) / float(num_pixels);
         end loop;
         --Put_Line ("this was fine");
         -- each value is the cumulative value from the PDF
-        for i in 1..256 loop
+        for i in 1..257 loop
             if i = 1 then
                 cumulative_hist(i) := pdf(i);
-                --Put_Line ("here");
             else 
                 cumulative_hist(i) := cumulative_hist(i-1) + pdf(i);
-                --Put_Line (integer'image(i) & ":" & float'image(cumulative_hist(i)));
             end if;
         end loop;
         -- map new grayscale values using a 1:1 correspondence
-        for i in 1..256 loop
+        for i in 1..257 loop
             for j in 1..img_read.rows loop
                 for k in 1..img_read.cols loop
                     if img_read.pixel(j,k) = i-1 then

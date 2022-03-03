@@ -121,10 +121,10 @@ procedure image is
 
     -- perform histogram equalization
     procedure imageEqualization(img_modified: in out img_record; img_read: in img_record) is 
-        hist: hist_arr (1..img_read.max_gs+1);
+        hist: hist_arr (1..img_read.max_gs+2);
     begin
         hist := makeHIST(img_read);
-        put_line("the histogram array is: ");
+        --put_line("the histogram array is: ");
         -- max_gs+1 because array start index is 1 (not 0)
         -- for i in 1..img_modified.max_gs+1 loop
         --     put_line(integer'image(i-1) & ":" & integer'image(hist(i)));
