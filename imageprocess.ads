@@ -11,4 +11,5 @@ package imageprocess is
     procedure imageLOG(img_modified: in out img_record);
     procedure imageSTRETCH(img_modified: in out img_record; min: in integer; max: in integer);
     function makeHIST(img_read: in img_record) return hist_arr; 
+    function histEQUAL(img_read: in img_record; hist: in hist_arr) return img_record; 
 end imageprocess;

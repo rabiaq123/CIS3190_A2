@@ -124,13 +124,13 @@ procedure image is
         hist: hist_arr (1..img_read.max_gs+1);
     begin
         hist := makeHIST(img_read);
-        Put_Line ("the histogram array is: ");
+        put_line("the histogram array is: ");
         -- max_gs+1 because array start index is 1 (not 0)
         -- for i in 1..img_modified.max_gs+1 loop
         --     put_line(integer'image(i-1) & ":" & integer'image(hist(i)));
         -- end loop;
         -- perform histogram equalization
-
+        img_modified := histEQUAL(img_read, hist);
     end imageEqualization;
 
     -- call subprogram in accordance with user input

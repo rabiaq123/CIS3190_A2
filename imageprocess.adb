@@ -72,4 +72,41 @@ package body imageprocess is
         end loop;
         return hist;
     end makeHIST;
+
+    -- perform histogram equalization of image
+    function histEQUAL(img_read: img_record; hist: hist_arr) return img_record is
+        img: img_record := img_read;
+        num_pixels: constant integer := img_read.cols * img_read.rows;
+        pdf: array(1..hist'length) of float; -- probability density function
+        cumulative_hist: array(1..256) of float; -- cumulative histogram; 256-element array
+    begin
+        -- calculate PDF of histogram by dividing each bin in the histogram by the total number of pixels in the image
+        for i in 1..hist'length loop
+            pdf(i) :=  float(hist(i) / num_pixels);
+            --Put_Line (integer'image(i) & ":" & float'image(pdf(i)));
+            --Put_Line (integer'image(i) & ":" & integer'image(hist(i)));
+        end loop;
+        --Put_Line ("this was fine");
+        -- each value is the cumulative value from the PDF
+        for i in 1..256 loop
+            if i = 1 then
+                cumulative_hist(i) := pdf(i);
+                --Put_Line ("here");
+            else 
+                cumulative_hist(i) := cumulative_hist(i-1) + pdf(i);
+                --Put_Line (integer'image(i) & ":" & float'image(cumulative_hist(i)));
+            end if;
+        end loop;
+        -- map new grayscale values using a 1:1 correspondence
+        for i in 1..256 loop
+            for j in 1..img_read.rows loop
+                for k in 1..img_read.cols loop
+                    if img_read.pixel(j,k) = i-1 then
+                        img.pixel(j,k) := integer(cumulative_hist(i) * 255.0);
+                    end if;
+                end loop;
+            end loop;
+        end loop;
+        return img;
+    end histEQUAL;
 end imageprocess;
