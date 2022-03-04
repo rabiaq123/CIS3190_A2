@@ -53,12 +53,12 @@ package body imageprocess is
 
     -- make histogram of image
     function makeHIST(img_read: img_record) return hist_arr is 
-        hist: hist_arr(1..img_read.max_gs+2);
+        hist: hist_arr(1..257);
         num_occurrences: integer;
     begin
         put_line("in makeHIST()");
         -- count number of times (index-1) occurs in image array, and store value in hist(index)
-        for idx in 1..img_read.max_gs+2 loop
+        for idx in 1..257 loop
             num_occurrences := 0;
             -- loop through image array and increment num occurences when applicable
             for i in 1..img_read.rows loop
@@ -77,12 +77,12 @@ package body imageprocess is
     function histEQUAL(img_read: img_record; hist: hist_arr) return img_record is
         img: img_record := img_read;
         num_pixels: constant integer := img_read.cols * img_read.rows;
-        pdf: array(1..hist'length) of float; -- probability density function
+        pdf: array(1..257) of float; -- probability density function
         cumulative_hist: array(1..257) of float; -- cumulative histogram; 256-element array
     begin
         -- calculate PDF of histogram by dividing each bin in the histogram by the total number of pixels in the image
-        for i in 1 .. hist'Length loop
-            pdf (i) := float(hist (i)) / float(num_pixels);
+        for i in 1..257 loop
+            pdf (i) := float(hist(i)) / float(num_pixels);
         end loop;
         --Put_Line ("this was fine");
         -- each value is the cumulative value from the PDF
