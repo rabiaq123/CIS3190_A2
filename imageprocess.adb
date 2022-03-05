@@ -4,16 +4,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
 -- image processing algorithms
--- subprogram imageINV(I) to perform image inversion
--- subprogram imageLOG(I) to perform logarithmic transformation
--- subprogram imageSTRETCH(I, imin, imax) to perform contrast-stretching
 
 package body imageprocess is
 
     -- perform image inversion
     procedure imageINV(img_modified: in out img_record) is 
     begin
-        put_line("in imageINV");
         for i in 1..img_modified.rows loop
             for j in 1..img_modified.cols loop
                 img_modified.pixel(i,j) := abs(255 - img_modified.pixel(i,j));
@@ -24,7 +20,6 @@ package body imageprocess is
     -- perform logarithmic transformation
     procedure imageLOG(img_modified: in out img_record) is 
     begin
-        put_line("in imageLOG");
         img_modified := img_read;
         for i in 1..img_modified.rows loop
             for j in 1..img_modified.cols loop
@@ -37,7 +32,6 @@ package body imageprocess is
     -- perform contrast-stretching
     procedure imageSTRETCH(img_modified: in out img_record; min: in integer; max: in integer) is 
     begin
-        put_line("in imageSTRETCH");
         for i in 1..img_modified.rows loop
             for j in 1..img_modified.cols loop
                 img_modified.pixel(i,j) := 255 * (img_modified.pixel(i,j) - min) / (max - min);
@@ -56,7 +50,6 @@ package body imageprocess is
         hist: hist_arr(1..257);
         num_occurrences: integer;
     begin
-        put_line("in makeHIST()");
         -- count number of times (index-1) occurs in image array, and store value in hist(index)
         for idx in 1..257 loop
             num_occurrences := 0;
@@ -84,7 +77,6 @@ package body imageprocess is
         for i in 1..257 loop
             pdf (i) := float(hist(i)) / float(num_pixels);
         end loop;
-        --Put_Line ("this was fine");
         -- each value is the cumulative value from the PDF
         for i in 1..257 loop
             if i = 1 then

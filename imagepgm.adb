@@ -4,7 +4,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with Ada.Strings.Maps; use Ada.Strings.Maps;
 with Ada.Strings; use Ada.Strings;
-
  
 package body imagepgm is
 
@@ -23,8 +22,6 @@ package body imagepgm is
             idx: natural := 1;
             whitespace : constant Character_Set := To_Set (' ');
         begin 
-            put_line("in getHeaderInfo");
-
             -- get header from file, line-by-line 
             get_line(fp, magic_id);
             get_line(fp, dimensions);
@@ -36,7 +33,6 @@ package body imagepgm is
                 put_line("Incorrect file format. The file must be in ASCII format (P2).");
                 put_line("Exiting program...");
             end if;
-
             if is_valid_file then
                 -- break string containing dimensions into substrings using whitespace delimiter
                 while idx in to_string(dimensions)'Range loop
@@ -71,12 +67,10 @@ package body imagepgm is
             whitespace : constant Character_Set := To_Set (' ');
             row_idx, col_idx: integer := 0;
         begin
-            put_line("in getImagePixels");
             -- get data (image) from file, line-by-line
             loop
                 exit when end_of_file(fp);
                 get_line(fp, line_of_data);
-
                 row_idx := row_idx + 1; -- every loop iteration represents a row of image data
                 -- reset column and string indices once all current line data is read
                 col_idx := 1; 
@@ -102,7 +96,6 @@ package body imagepgm is
         -- store image file data in record
         procedure storeInRecord(img_read: in out img_record; num_cols: in integer; num_rows: in integer; max_gs: in integer; og_img: in img_array) is 
         begin
-            put_line("in storeInRecord");
             img_read.cols := num_cols;
             img_read.rows := num_rows;
             img_read.max_gs := max_gs;
@@ -114,7 +107,6 @@ package body imagepgm is
         end storeInRecord;
 
     begin
-        put_line("in readPGM");
         -- store PGM file contents
         open(fp, in_file, to_string(input_fname));
         getHeaderInfo(fp, is_valid_file, num_rows, num_cols, max_gs);
@@ -129,9 +121,7 @@ package body imagepgm is
     fp: file_type;
 
     begin
-        put_line("in writePGM");
         put_line("You can view your input images and the output created through https://ij.imjoy.io/.");
-
         create(fp, out_file, to_string(output_fname));
         set_output(fp);
         put_line("P2");

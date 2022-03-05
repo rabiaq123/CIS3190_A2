@@ -9,14 +9,12 @@ with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
 with Ada.Strings; use Ada.Strings; 
 with ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with imagedata; use imagedata;
 with imagepgm; use imagepgm;
 with imageprocess; use imageprocess;
-with imagedata; use imagedata;
 
-
--- main wrapper program
--- allow user to interact with the imagePROCESS and imagePGM packages; reading in images,
--- manipulating them, and writing them to file
+-- main wrapper program to read in images, manipulate them, and write them to file
+-- allow user interaction with the imagePROCESS and imagePGM packages
 
 procedure image is
     type ftype is (input, output);
@@ -124,12 +122,6 @@ procedure image is
         hist: hist_arr (1..img_read.max_gs+2);
     begin
         hist := makeHIST(img_read);
-        --put_line("the histogram array is: ");
-        -- max_gs+1 because array start index is 1 (not 0)
-        -- for i in 1..img_modified.max_gs+1 loop
-        --     put_line(integer'image(i-1) & ":" & integer'image(hist(i)));
-        -- end loop;
-        -- perform histogram equalization
         img_modified := histEQUAL(img_read, hist);
     end imageEqualization;
 
@@ -178,12 +170,4 @@ begin
     -- write to output file
     output_fname := getFilename (output);
     writePGM (output_fname, img_modified);
-
-    --for i in 1..img_read.rows loop
-    --    put("row" & integer'image(i) & ":");
-    --    for j in 1..img_read.cols loop
-    --        put(integer'image(img_read.pixel(i,j)) & " ");
-    --    end loop;
-    --    new_line;
-    --end loop;
 end image;
