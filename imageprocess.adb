@@ -1,6 +1,5 @@
 -- package body
 
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 
 -- image processing algorithms

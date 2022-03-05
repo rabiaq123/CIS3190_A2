@@ -3,7 +3,6 @@
 -- March 4, 2022
 
 with ada.Text_IO; use Ada.Text_IO;
-with Ada.IO_Exceptions; use Ada.IO_Exceptions;
 with ada.strings.unbounded; use ada.strings.unbounded;
 with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 with ada.directories; use ada.directories;
@@ -19,7 +18,7 @@ with imageprocess; use imageprocess;
 procedure image is
     type ftype is (input, output);
     input_fname, output_fname: unbounded_string;
-    is_valid_input_file: boolean := true;
+    is_valid_input_file, quit: boolean;
 
     -- print program info to user
     procedure welcomeUser is 
@@ -126,12 +125,13 @@ procedure image is
     end imageEqualization;
 
     -- call subprogram in accordance with user input
-    procedure performAction(img_read: in img_record; img_modified: in out img_record) is 
+    procedure performAction(img_read: in img_record; img_modified: in out img_record; quit: out boolean) is 
         choice: integer; 
         min, max: integer;
         is_valid_input: boolean := false;
     begin
         img_modified := img_read;
+        quit := false;
         loop
             exit when is_valid_input;
             is_valid_input := true; -- reset to true so flag is only set to false when latest user input is invalid
@@ -147,11 +147,10 @@ procedure image is
                 when 4 =>
                     imageEqualization(img_modified, img_read);
                 when 5 =>
-                    put_line("Exiting program...");
-                    return;
+                    quit := true;
                 when others =>
-                    put_line("Invalid input.");
                     is_valid_input := false;
+                    put_line("Invalid input.");
             end case;
         end loop;
     end performAction;
@@ -159,14 +158,20 @@ procedure image is
 begin
     welcomeUser;
     -- read input file and store contents in record
+    is_valid_input_file := true;
     input_fname := getFilename(input);
     readPGM(img_read, input_fname, is_valid_input_file);
     -- return if input file is invalid
     if is_valid_input_file = false then
+        put_line("Exiting program...");
         return;
     end if;
-    -- give user options for what to do with input data read
-    performAction(img_read, img_modified);
+    -- perform user's chosen image transformation and quit if user desires 
+    performAction(img_read, img_modified, quit);
+    if quit then
+        put_line("Exiting program...");
+        return;
+    end if;
     -- write to output file
     output_fname := getFilename (output);
     writePGM (output_fname, img_modified);
