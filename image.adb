@@ -111,27 +111,6 @@ procedure image is
         skip_line;
     end showMenu;
 
-    -- get min and max intensity values if user chooses to perform image stretching function
-    procedure getIntensityValues(min: out integer; max: out integer) is 
-        min_str, max_str: unbounded_string;
-    begin
-        put("Minimum intensity value: ");
-        get_line(min_str);
-        put("Maximum intensity value: ");
-        get_line(max_str);
-        -- convert to integer
-        min := integer'value(to_string(min_str));
-        max := integer'value(to_string(max_str));
-    end getIntensityValues;
-
-    -- perform histogram equalization
-    procedure imageEqualization(img_modified: in out img_record; img_read: in img_record) is 
-        hist: hist_arr (1..img_read.max_gs+2);
-    begin
-        hist := makeHIST(img_read);
-        img_modified := histEQUAL(img_read, hist);
-    end imageEqualization;
-
     -- call subprogram in accordance with user input
     procedure performAction(img_read: in img_record; img_modified: in out img_record; quit: out boolean) is 
         choice: integer; 
@@ -148,7 +127,7 @@ procedure image is
                 when 1 =>
                     imageINV(img_modified);
                 when 2 =>
-                    imageLOG (img_modified);
+                    imageLOG(img_modified);
                 when 3 =>
                     getIntensityValues(min, max);
                     imageSTRETCH(img_modified, min, max);

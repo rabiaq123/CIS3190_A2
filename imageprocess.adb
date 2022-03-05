@@ -1,6 +1,9 @@
 -- package body
 
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
+with Ada.Text_IO; use Ada.Text_IO;
+with ada.strings.unbounded; use ada.strings.unbounded;
+with ada.strings.unbounded.Text_IO; use ada.strings.unbounded.Text_IO;
 
 -- image processing algorithms
 
@@ -25,8 +28,20 @@ package body imageprocess is
                 img_modified.pixel(i,j) := integer(log(float(img_modified.pixel(i,j))) * (255.0/(log(255.0))));
             end loop;
         end loop;
-
     end imageLOG;
+
+    -- get min and max intensity values if user chooses to perform image stretching function
+    procedure getIntensityValues(min: out integer; max: out integer) is 
+        min_str, max_str: unbounded_string;
+    begin
+        put("Minimum intensity value: ");
+        get_line(min_str);
+        put("Maximum intensity value: ");
+        get_line(max_str);
+        -- convert to integer
+        min := integer'value(to_string(min_str));
+        max := integer'value(to_string(max_str));
+    end getIntensityValues;
 
     -- perform contrast-stretching
     procedure imageSTRETCH(img_modified: in out img_record; min: in integer; max: in integer) is 
@@ -43,6 +58,14 @@ package body imageprocess is
             end loop;
         end loop;
     end imageSTRETCH;
+
+    -- call subprograms required to perform histogram equalization
+    procedure imageEqualization(img_modified: in out img_record; img_read: in img_record) is 
+        hist: hist_arr (1..img_read.max_gs+2);
+    begin
+        hist := makeHIST(img_read);
+        img_modified := histEQUAL(img_read, hist);
+    end imageEqualization;
 
     -- make histogram of image
     function makeHIST(img_read: img_record) return hist_arr is 
