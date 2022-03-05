@@ -29,62 +29,70 @@ procedure image is
         put_line("Once you enter a valid input PGM image file, you'll have a list of options to choose from.");
     end welcomeUser;
 
+    -- get input file name and perform error handling
+    procedure handleInputFile(fname: in out unbounded_string; is_valid_file: in out boolean) is
+    begin 
+        -- loop until valid filename is entered
+        while is_valid_file = false loop
+            put("Enter the name of the file to be read: ");
+            get_line(fname);
+            if (fname /= "") then
+                if exists(to_string(fname)) = true then
+                    is_valid_file := true;
+                end if;
+            end if;
+            -- generate error if input file does not exist
+            if is_valid_file = false then
+                put("An input file with this name does not exist. ");
+            end if;
+        end loop;
+    end handleInputFile;
+
+    -- get output file name and perform error handling
+    procedure handleOutputFile(fname: in out unbounded_string; is_valid_file: in out boolean) is
+        response: character;
+    begin
+        -- loop until valid filename is entered
+        while is_valid_file = false loop
+            put("Enter the name of the file to be written to: ");
+            get_line(fname);
+            if (fname /= "") then -- filename was entered
+                if exists(to_string(fname)) = true then -- file with desired filename already exists
+                    put_line("An output file with this name already exists. Would you like to overwrite it? (Y/N)");
+                    put("> ");
+                    loop -- loop until Y or N is entered
+                        get(response);
+                        skip_line; -- skip newline that will come from the previous input 
+                        if response = 'Y' then
+                            is_valid_file := true;
+                        elsif response = 'N' then
+                            is_valid_file := false;
+                        else 
+                            put_line("Invalid response. Enter 'Y' or 'N'."); 
+                            put("> ");
+                        end if;
+                        exit when response = 'Y' or response = 'N';
+                    end loop;
+                else -- no file with desired name exists yet
+                    is_valid_file := true;
+                end if;
+            else -- no filename was entered (pressed ENTER)
+                put("Invalid output filename. ");
+            end if;
+        end loop;
+    end handleOutputFile;
+
     -- ask user for the name of the file to be read or written, and handle exceptions
     function getFilename(fileType: ftype) return unbounded_string is 
         filename: unbounded_string;
         is_valid_file: boolean := false;
-        response: character;
     begin 
-        new_line;
-        while is_valid_file = false loop
-            -- prompt changes depending on whether input or output filename is needed
-            if fileType = input then
-                put("Enter the name of the file to be read: ");
-                get_line(filename);
-                if (filename /= "") then
-                    if exists(to_string(filename)) = true then
-                        is_valid_file := true;
-                    end if;
-                end if;
-            else 
-                <<getName>>
-                put("Enter the name of the file to be written to: ");
-                get_line(filename);
-                if (filename /= "") then
-                    if exists(to_string(filename)) = true then
-                        is_valid_file := false;
-                    else
-                        is_valid_file := true;
-                    end if;
-                else
-                    put("Invalid output filename. ");
-                    goto getName;
-                end if;
-            end if;
-            -- loop until valid filename is entered
-            exit when is_valid_file;
-            -- generate error if input file does not exist
-            if fileType = input then 
-                put("An input file with this name does not exist. ");
-            else 
-                -- generate error if output file exists, and request whether it should be overwritten. 
-                put_line("An output file with this name already exists. Would you like to overwrite it? (Y/N)");
-                put("> ");
-                loop
-                    get(response);
-                    skip_line; -- skip newline that will come from the previous input 
-                    if response = 'Y' then
-                        is_valid_file := true;
-                    elsif response = 'N' then
-                        is_valid_file := false;
-                    else 
-                        put_line("Invalid response. Enter 'Y' or 'N'."); 
-                        put("> ");
-                    end if;
-                    exit when response = 'Y' or response = 'N';
-                end loop;
-            end if;
-        end loop;
+        new_line; -- enter newline before any prompts for input/output filename are displayed
+        if fileType = input then 
+            handleInputFile(filename, is_valid_file);
+        else
+            handleOutputFile(filename, is_valid_file);
+        end if;
         return filename;
     end getFilename; 
 
