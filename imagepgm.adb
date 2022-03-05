@@ -31,7 +31,6 @@ package body imagepgm is
             if magic_id /= "P2" then
                 is_valid_file := false;
                 put_line("Incorrect file format. The file must be in ASCII format (P2).");
-                put_line("Exiting program...");
             end if;
             if is_valid_file then
                 -- break string containing dimensions into substrings using whitespace delimiter
@@ -59,7 +58,7 @@ package body imagepgm is
         end getHeaderInfo;
 
         -- store image in integer array
-        procedure getImagePixels(fp: in out file_type; img: out img_array) is 
+        procedure getImagePixels(fp: in out file_type; is_valid_file: in out boolean; img: out img_array; max_gs: in integer) is 
             line_of_data: unbounded_string;
             first: positive;
             last: natural;
@@ -69,7 +68,7 @@ package body imagepgm is
         begin
             -- get data (image) from file, line-by-line
             loop
-                exit when end_of_file(fp);
+                exit when end_of_file(fp) or is_valid_file = false;
                 get_line(fp, line_of_data);
                 row_idx := row_idx + 1; -- every loop iteration represents a row of image data
                 -- reset column and string indices once all current line data is read
@@ -87,6 +86,11 @@ package body imagepgm is
                     exit when last = 0;
                     -- store values in integer variables
                     img(row_idx, col_idx) := integer'value(to_string(line_of_data)(first..last));
+                    -- error handling for invalid image data
+                    if img(row_idx, col_idx) > max_gs or img(row_idx, col_idx) < 0 then
+                        is_valid_file := false;
+                        put_line("Incorrect image contents; your image pixels must be within the range 0 -" & integer'image(max_gs) & ".");
+                    end if;
                     col_idx := col_idx + 1;
                     str_idx := last + 1;
                 end loop;
@@ -110,10 +114,12 @@ package body imagepgm is
         -- store PGM file contents
         open(fp, in_file, to_string(input_fname));
         getHeaderInfo(fp, is_valid_file, num_rows, num_cols, max_gs);
-        getImagePixels(fp, og_img);
+        getImagePixels(fp, is_valid_file, og_img, max_gs);
         close(fp);
         -- store values in record
-        storeInRecord(img_read, num_cols, num_rows, max_gs, og_img);
+        if is_valid_file then
+            storeInRecord(img_read, num_cols, num_rows, max_gs, og_img);
+        end if;
     end readPGM;
 
     -- take image record as input, and write the image to file as a P2 PGM format
