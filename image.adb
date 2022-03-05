@@ -83,12 +83,12 @@ procedure image is
     end handleOutputFile;
 
     -- ask user for the name of the file to be read or written, and handle exceptions
-    function getFilename(fileType: ftype) return unbounded_string is 
+    function getFilename(file_type: ftype) return unbounded_string is 
         filename: unbounded_string;
         is_valid_file: boolean := false;
     begin 
         new_line; -- enter newline before any prompts for input/output filename are displayed
-        if fileType = input then 
+        if file_type = input then 
             handleInputFile(filename, is_valid_file);
         else
             handleOutputFile(filename, is_valid_file);
@@ -161,5 +161,5 @@ begin
     end if;
     -- write to output file
     output_fname := getFilename (output);
-    writePGM (output_fname, img_modified);
+    writePGM(output_fname, img_modified);
 end image;
