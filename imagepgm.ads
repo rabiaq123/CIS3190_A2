@@ -7,6 +7,6 @@ with imagedata; use imagedata;
 -- should contain subprograms readPGM() and writePGM()
 
 package imagepgm is
-    procedure readPGM(img_read: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean);
+    procedure readPGM(img_rec: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean);
     procedure writePGM(output_fname: in unbounded_string; img_modified: in img_record);
 end imagepgm;

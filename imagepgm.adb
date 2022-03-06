@@ -9,13 +9,13 @@ package body imagepgm is
 
     -- take filename as input and return a record representing the image
     -- include error checking for magic identifier and other inconsistencies with the input file
-    procedure readPGM(img_read: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean) is 
+    procedure readPGM(img_rec: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean) is 
         fp: file_type;
         num_rows, num_cols, max_gs: integer;
-        og_img: img_array;
+        img: img_array;
 
         -- get input image dimensions to be able to store modified image in an array of that size
-        procedure getHeaderInfo(fp: in out file_type; is_valid_file: in out boolean; n_rows: out integer; n_cols: out integer; max_gs: out integer) is
+        procedure getHeaderInfo(fp: in out file_type; is_valid_file: in out boolean; img_rec: in out img_record) is
             magic_id, dimensions, max_gs_str: unbounded_string;
             first: positive;
             last: natural;
@@ -45,20 +45,20 @@ package body imagepgm is
                     exit when last = 0;
                     -- store values in integer variables
                     if idx = 1 then
-                        n_cols := integer'value(to_string(dimensions)(first..last));
+                        img_rec.cols := integer'value(to_string(dimensions)(first..last));
                     else 
-                        n_rows := integer'value(to_string(dimensions)(first..last));
+                        img_rec.rows := integer'value(to_string(dimensions)(first..last));
                     end if;
                     idx := last + 1;
                 end loop;
 
                 -- store grayscale value as integer
-                max_gs := integer'value(to_string(max_gs_str));
+                img_rec.max_gs := integer'value(to_string(max_gs_str));
             end if;
         end getHeaderInfo;
 
-        -- store image in integer array
-        procedure getImagePixels(fp: in out file_type; is_valid_file: in out boolean; img: out img_array; max_gs: in integer) is 
+        -- store image in image record
+        procedure getImagePixels(fp: in out file_type; is_valid_file: in out boolean; img_rec: in out img_record) is 
             line_of_data: unbounded_string;
             first: positive;
             last: natural;
@@ -85,11 +85,11 @@ package body imagepgm is
                         Last    => last);
                     exit when last = 0;
                     -- store values in integer variables
-                    img(row_idx, col_idx) := integer'value(to_string(line_of_data)(first..last));
+                    img_rec.pixel(row_idx, col_idx) := integer'value(to_string(line_of_data)(first..last));
                     -- error handling for invalid image data
-                    if img(row_idx, col_idx) > max_gs or img(row_idx, col_idx) < 0 then
+                    if img_rec.pixel(row_idx, col_idx) > img_rec.max_gs or img_rec.pixel(row_idx, col_idx) < 0 then
                         is_valid_file := false;
-                        put_line("Incorrect image contents; your image pixels must be within the range 0 -" & integer'image(max_gs) & ".");
+                        put_line("Incorrect image contents; your image pixels must be within the range 0 -" & integer'image(img_rec.max_gs) & ".");
                     end if;
                     col_idx := col_idx + 1;
                     str_idx := last + 1;
@@ -97,29 +97,12 @@ package body imagepgm is
             end loop;
         end getImagePixels;
 
-        -- store image file data in record
-        procedure storeInRecord(img_read: in out img_record; num_cols: in integer; num_rows: in integer; max_gs: in integer; og_img: in img_array) is 
-        begin
-            img_read.cols := num_cols;
-            img_read.rows := num_rows;
-            img_read.max_gs := max_gs;
-            for i in 1..num_rows loop
-                for j in 1..num_cols loop
-                    img_read.pixel(i,j) := og_img(i,j);
-                end loop;
-            end loop;
-        end storeInRecord;
-
     begin
         -- store PGM file contents
         open(fp, in_file, to_string(input_fname));
-        getHeaderInfo(fp, is_valid_file, num_rows, num_cols, max_gs);
-        getImagePixels(fp, is_valid_file, og_img, max_gs);
+        getHeaderInfo(fp, is_valid_file, img_rec);
+        getImagePixels(fp, is_valid_file, img_rec);
         close(fp);
-        -- store values in record
-        if is_valid_file then
-            storeInRecord(img_read, num_cols, num_rows, max_gs, og_img);
-        end if;
     end readPGM;
 
     -- take image record as input, and write the image to file as a P2 PGM format
