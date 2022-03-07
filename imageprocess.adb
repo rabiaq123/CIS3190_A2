@@ -61,7 +61,7 @@ package body imageprocess is
 
     -- call subprograms required to perform histogram equalization
     procedure imageEqualization(img_modified: in out img_record; img_read: in img_record) is 
-        hist: hist_arr (1..img_read.max_gs+2);
+        hist: hist_arr (1..257);
     begin
         hist := makeHIST(img_read);
         img_modified := histEQUAL(img_read, hist);

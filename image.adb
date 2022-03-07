@@ -37,7 +37,7 @@ procedure image is
             put("Enter the name of the file to be read: ");
             get_line(fname);
             if (fname /= "") then
-                if exists(to_string(fname)) = true then
+                if exists(to_string(fname)) then
                     is_valid_file := true;
                 end if;
             end if;
@@ -57,7 +57,12 @@ procedure image is
             put("Enter the name of the file to be written to: ");
             get_line(fname);
             if (fname /= "") then -- filename was entered
-                if exists(to_string(fname)) = true then -- file with desired filename already exists
+                if index(fname, ".pgm") <= 0 then
+                    put_line("Appending .pgm extension to the end of the filename entered...");
+                    append(fname, ".pgm");
+                    put_line("The output filename is: " & fname);
+                end if;
+                if exists(to_string(fname)) then -- file with desired filename already exists
                     put_line("An output file with this name already exists. Would you like to overwrite it? (Y/N)");
                     put("> ");
                     loop -- loop until Y or N is entered
@@ -87,7 +92,7 @@ procedure image is
         filename: unbounded_string;
         is_valid_file: boolean := false;
     begin 
-        new_line; -- enter newline before any prompts for input/output filename are displayed
+        new_line; -- enter newline before any input/output filename prompts are displayed
         if file_type = input then 
             handleInputFile(filename, is_valid_file);
         else
@@ -108,7 +113,7 @@ procedure image is
         put_line("5. Quit");
         put("> ");
         get(choice);
-        skip_line;
+        skip_line; -- skip newline that will come from previous input
     end showMenu;
 
     -- call subprogram in accordance with user input
@@ -119,8 +124,7 @@ procedure image is
     begin
         img_modified := img_read;
         quit := false;
-        loop
-            exit when is_valid_input;
+        while is_valid_input = false loop
             is_valid_input := true; -- reset to true so flag is only set to false when latest user input is invalid
             showMenu(choice);
             case choice is

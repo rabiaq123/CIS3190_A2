@@ -11,8 +11,6 @@ package body imagepgm is
     -- include error checking for magic identifier and other inconsistencies with the input file
     procedure readPGM(img_rec: in out img_record; input_fname: in unbounded_string; is_valid_file: in out boolean) is 
         fp: file_type;
-        num_rows, num_cols, max_gs: integer;
-        img: img_array;
 
         -- get input image dimensions to be able to store modified image in an array of that size
         procedure getHeaderInfo(fp: in out file_type; is_valid_file: in out boolean; img_rec: in out img_record) is
@@ -34,6 +32,7 @@ package body imagepgm is
             end if;
             if is_valid_file then
                 -- break string containing dimensions into substrings using whitespace delimiter
+                -- resource used: https://learn.adacore.com/courses/intro-to-ada/chapters/standard_library_strings.html#string-operations
                 while idx in to_string(dimensions)'Range loop
                     Find_Token
                         (Source => dimensions,
@@ -75,7 +74,8 @@ package body imagepgm is
                 col_idx := 1; 
                 str_idx := 1;
                 -- break line of image data into substrings using whitespace delimiter
-                while str_idx in to_string(line_of_data)'Range loop
+                -- resource used: https://learn.adacore.com/courses/intro-to-ada/chapters/standard_library_strings.html#string-operations
+                while str_idx in To_String (line_of_data)'Range loop
                     Find_Token
                         (Source => line_of_data,
                         Set     => whitespace,
@@ -107,8 +107,7 @@ package body imagepgm is
 
     -- take image record as input, and write the image to file as a P2 PGM format
     procedure writePGM(output_fname: in unbounded_string; img_modified: in img_record) is
-    fp: file_type;
-
+        fp: file_type;
     begin
         put_line("You can view your input images and the output created through https://ij.imjoy.io/.");
         create(fp, out_file, to_string(output_fname));
