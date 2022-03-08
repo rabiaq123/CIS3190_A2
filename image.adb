@@ -37,6 +37,12 @@ procedure image is
             put("Enter the name of the file to be read: ");
             get_line(fname);
             if (fname /= "") then
+                -- append extension to filename if not already present
+                if index(fname, ".pgm") <= 0 then
+                    put_line("Appending .pgm extension to the end of the filename entered...");
+                    append(fname, ".pgm");
+                    put_line("The input filename is: " & fname);
+                end if;
                 if exists(to_string(fname)) then
                     is_valid_file := true;
                 end if;
@@ -57,7 +63,8 @@ procedure image is
             put("Enter the name of the file to be written to: ");
             get_line(fname);
             if (fname /= "") then -- filename was entered
-                if index(fname, ".pgm") <= 0 then
+                -- append extension to filename if not already present
+                if Index (fname, ".pgm") <= 0 then
                     put_line("Appending .pgm extension to the end of the filename entered...");
                     append(fname, ".pgm");
                     put_line("The output filename is: " & fname);
